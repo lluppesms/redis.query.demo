@@ -1,4 +1,4 @@
-# Azure Graph Query Demo
+# Azure Redis Graph Query Demo
 
 [![Open in vscode.dev](https://img.shields.io/badge/Open%20in-vscode.dev-blue)][1]
 
