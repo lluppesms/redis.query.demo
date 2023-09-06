@@ -1,0 +1,18 @@
+# ----------------------------------------------------------------------------------------------------
+# Pipeline used by the azd command
+# ----------------------------------------------------------------------------------------------------
+name: graph.query.demo
+
+infra:
+    provider: bicep
+    path: infra
+    module: azd-main
+
+pipeline:
+    provider: github
+
+services:
+  function:
+    project: src/Graph.Query/
+    language: csharp
+    host: function

@@ -1,0 +1,89 @@
+# ------------------------------------------------------------------------------------------------------------------------
+# GHA Reusable Called Workflow to deploy Azure Resources Only
+# ------------------------------------------------------------------------------------------------------------------------
+# You need to set up secrets in the GitHub Secrets Repository before running these workflows.
+#   See Docs\CreateGitHubSecrets\.md for details
+# ------------------------------------------------------------------------------------------------------------------------
+name: template.deploy.infra
+run-name: Deploy Infra
+on:
+  workflow_call:
+    inputs:
+      envCode:
+        required: true
+        type: string
+      securityScan:
+        required: false
+        type: string
+        default: 'false'
+  
+# ------------------------------------------------------------------------------------------------------------------------
+jobs:
+  scan-code:
+    name: Scan Source Code
+    if: inputs.securityScan == 'true'
+    uses: ./.github/workflows/template-security-scan.yml
+
+  deploy:
+    name: Create Infra
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.envCode }}
+    
+    env:
+      generatedAppEnvName: ${{ vars.APP_NAME }}-${{ inputs.envCode }}
+      generatedResourceGroupName: ${{ vars.RESOURCE_GROUP_PREFIX }}-${{ inputs.envCode }}
+
+    steps:
+    - name: Display Variables
+      run: |-
+        echo "generatedAppEnvName=${{ env.generatedAppEnvName }}"
+        echo "generatedResourceGroupName=${{ env.generatedResourceGroupName }}"
+        echo "appName=${{ vars.APP_NAME }}"
+        echo "location=${{ vars.AZURE_LOCATION }}"
+        echo "storageSku=${{ vars.STORAGE_SKU }}"
+        echo "functionAppSku=${{ vars.FUNCTION_APP_SKU }}"
+        echo "functionAppSkuFamily=${{ vars.FUNCTION_APP_SKU_FAMILY }}"
+        echo "functionAppSkuTier=${{ vars.FUNCTION_APP_SKU_TIER }}"
+        echo "Resource Group Command:"
+        echo "  az group create --name ${{ env.generatedResourceGroupName }} --location ${{ vars.AZURE_LOCATION }} --tags Application=${{ vars.APP_NAME }} Environment=${{ inputs.envCode }}"
+        echo "Bicep Deploy Sample Command:"
+        echo "  az deployment group create -n main-deploy-${{ env.runDateTimeZ }} --resource-group ${{ env.generatedResourceGroupName }} --template-file 'main.bicep' --parameters environment=${{ inputs.envCode }} location=${{ vars.AZURE_LOCATION }} appName=${{ vars.APP_NAME }} keyVaultOwnerUserId=${{ env.keyVaultOwnerUserId }}"
+        echo "Pipeline Workspace Directory Contents:"
+        tree ${{ env.GITHUB_ACTION_PATH }}
+      continue-on-error: true
+
+    - name: Checkout Code
+      uses: actions/checkout@main
+
+    - name: List Files
+      run: 
+        tree ${{ env.GITHUB_ACTION_PATH }}
+      continue-on-error: true
+
+    - name: Log into Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Create Resource Group
+      run: 
+        az group create --name ${{ env.generatedResourceGroupName }} --location ${{ vars.AZURE_LOCATION }} --tags Environment=${{ inputs.envCode }} Application=${{ vars.APP_NAME }}
+
+    - name: Deploy Azure Resources
+      uses: azure/arm-deploy@v1
+      with:
+        scope: resourcegroup
+        region: ${{ vars.AZURE_LOCATION }}
+        resourceGroupName: ${{ env.generatedResourceGroupName }}
+        template: infra/Bicep/main.bicep
+        parameters: >
+          appName=${{ vars.APP_NAME }}
+          environmentCode=${{ inputs.envCode }}
+          keyVaultOwnerUserId=${{ secrets.KEYVAULT_OWNER_USERID }}
+          location=${{ vars.AZURE_LOCATION }}
+          storageSku=${{ vars.STORAGE_SKU }}
+          functionAppSku=${{ vars.FUNCTION_APP_SKU }}
+          functionAppSkuFamily=${{ vars.FUNCTION_APP_SKU_FAMILY }}
+          functionAppSkuTier=${{ vars.FUNCTION_APP_SKU_TIER }}
+      

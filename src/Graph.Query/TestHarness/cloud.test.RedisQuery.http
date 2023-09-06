@@ -1,0 +1,149 @@
+# You can also use the Swagger UI: http://lll-graphquery-dev.azurewebsites.net/api/swagger/ui
+
+# Note: populating a scenario with 2,500 record sets takes a long time
+#   If your debug session fails for taking too long, you can try changing the timeout:
+#     Tools > Options > Text Editor | Rest | Advanced | Response | Request timeout
+#   Good article: https://csharp.christiannagel.com/2023/03/21/httptools/
+
+@baseUrl = https://your-graphquery-url.azurewebsites.net/api
+@FunctionMasterKey = yourFunctionMasterKey...
+
+@adminUserId = yourUserId
+@scenarioUserId10 = UNP:10
+@scenarioUserId100 = UNP:100
+@scenarioUserId1000 = UNP:1000
+
+### ---------------------------------------------------------------------------
+### Populate a Scenario with lots of accounts (this takes a few minutes...)
+### ~ 100 records = 13 seconds, 1000 records = 32 seconds
+### Note: the API will time out and throw and error
+###   but it will continue to process in the background
+@scenarioAccountCount = 1000
+GET {{baseUrl}}/scenario/load/{{scenarioAccountCount}} HTTP/1.1
+x-functions-key: {{FunctionMasterKey}}
+
+### ---------------------------------------------------------------------------
+### List all of the accounts in the current scenario
+GET {{baseUrl}}/scenario/accounts HTTP/1.1
+x-functions-key: {{FunctionMasterKey}}
+
+### ---------------------------------------------------------------------------
+### List all of the users in the current scenario
+GET {{baseUrl}}/scenario/users HTTP/1.1
+x-functions-key: {{FunctionMasterKey}}
+
+### ---------------------------------------------------------------------------
+### List all Keys for one user with 10 accounts
+GET {{baseUrl}}/scenario/user/{{scenarioUserId10}} HTTP/1.1
+x-functions-key: {{FunctionMasterKey}}
+### ---------------------------------------------------------------------------
+### List only Sites for one user with 10 accounts
+GET {{baseUrl}}/scenario/user/SITE/{{scenarioUserId10}} HTTP/1.1
+x-functions-key: {{FunctionMasterKey}}
+### ---------------------------------------------------------------------------
+### List only Assets for one user with 10 accounts
+GET {{baseUrl}}/scenario/user/ASSET/{{scenarioUserId10}} HTTP/1.1
+x-functions-key: {{FunctionMasterKey}}
+### ---------------------------------------------------------------------------
+### List only Accounts for one user with 10 accounts
+GET {{baseUrl}}/scenario/user/NSG:ACCT/{{scenarioUserId10}} HTTP/1.1
+x-functions-key: {{FunctionMasterKey}}
+
+
+### ---------------------------------------------------------------------------
+### List all Keys for one user with 100 accounts
+GET {{baseUrl}}/scenario/user/{{scenarioUserId100}} HTTP/1.1
+x-functions-key: {{FunctionMasterKey}}
+### ---------------------------------------------------------------------------
+### List only Sites for one user with 100 accounts
+GET {{baseUrl}}/scenario/user/SITE/{{scenarioUserId100}} HTTP/1.1
+x-functions-key: {{FunctionMasterKey}}
+### ---------------------------------------------------------------------------
+### List only Assets for one user with 100 accounts
+GET {{baseUrl}}/scenario/user/ASSET/{{scenarioUserId100}} HTTP/1.1
+x-functions-key: {{FunctionMasterKey}}
+### ---------------------------------------------------------------------------
+### List only Accounts for one user with 100 accounts
+GET {{baseUrl}}/scenario/user/NSG:ACCT/{{scenarioUserId100}} HTTP/1.1
+x-functions-key: {{FunctionMasterKey}}
+
+
+### ---------------------------------------------------------------------------
+### List all Keys for one user with 1000 accounts
+GET {{baseUrl}}/scenario/user/{{scenarioUserId1000}} HTTP/1.1
+x-functions-key: {{FunctionMasterKey}}
+### ---------------------------------------------------------------------------
+### List only Sites for one user with 1000 accounts
+GET {{baseUrl}}/scenario/user/SITE/{{scenarioUserId1000}} HTTP/1.1
+x-functions-key: {{FunctionMasterKey}}
+### ---------------------------------------------------------------------------
+### List only Assets for one user with 1000 accounts
+GET {{baseUrl}}/scenario/user/ASSET/{{scenarioUserId1000}} HTTP/1.1
+x-functions-key: {{FunctionMasterKey}}
+### ---------------------------------------------------------------------------
+### List only Accounts for one user with 100 accounts
+GET {{baseUrl}}/scenario/user/NSG:ACCT/{{scenarioUserId1000}} HTTP/1.1
+x-functions-key: {{FunctionMasterKey}}
+
+
+### ---------------------------------------------------------------------------
+### Populate Redis with Simple Sample Data (small sample size)
+### ---------------------------------------------------------------------------
+GET {{baseUrl}}/load/{{adminUserId}} HTTP/1.1
+x-functions-key: {{FunctionMasterKey}}
+
+### ---------------------------------------------------------------------------
+### List values for one user
+GET {{baseUrl}}/list/UNP:{{adminUserId}} HTTP/1.1
+x-functions-key: {{FunctionMasterKey}}
+
+### ---------------------------------------------------------------------------
+### List a unioned set of values for one user
+GET {{baseUrl}}/union/UNP:{{adminUserId}} HTTP/1.1
+x-functions-key: {{FunctionMasterKey}}
+
+
+### ---------------------------------------------------------------------------
+### List all the keys in the entire database
+### ---------------------------------------------------------------------------
+GET {{baseUrl}}/listall HTTP/1.1
+x-functions-key: {{FunctionMasterKey}}
+
+### ---------------------------------------------------------------------------
+### List summary keys
+### ---------------------------------------------------------------------------
+@key = SCENARIO_ACCOUNTS
+GET {{baseUrl}}/list/{{key}} HTTP/1.1
+x-functions-key: {{FunctionMasterKey}}
+### ---------------------------------------------------------------------------
+@key = SCENARIO_SITES
+GET {{baseUrl}}/list/{{key}} HTTP/1.1
+x-functions-key: {{FunctionMasterKey}}
+### ---------------------------------------------------------------------------
+@key = SCENARIO_USERS
+GET {{baseUrl}}/list/{{key}} HTTP/1.1
+x-functions-key: {{FunctionMasterKey}}
+
+
+
+
+### ---------------------------------------------------------------------------
+### Delete a value for one key
+### ---------------------------------------------------------------------------
+GET {{baseUrl}}/delete/UNP:{{adminUserId}} HTTP/1.1
+x-functions-key: {{FunctionMasterKey}}
+
+
+### ---------------------------------------------------------------------------
+### Delete all values in the entire database
+### ---------------------------------------------------------------------------
+GET {{baseUrl}}/resetdatabase/HTTP/1.1
+x-functions-key: {{FunctionMasterKey}}
+
+
+### ---------------------------------------------------------------------------
+### Unit Test with missing users
+### ---------------------------------------------------------------------------
+@bogusUserId = bogus
+GET {{baseUrl}}/list/UNP:{{bogusUserId}} HTTP/1.1
+x-functions-key: {{FunctionMasterKey}}

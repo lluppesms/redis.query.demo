@@ -1,0 +1,23 @@
+
+/* Copy these values to your local.settings.json and adjust the Redis Key Vaults. The pipeline will populate the Azure Deployment Configuration with these values. */
+
+{
+  "IsEncrypted": false,
+  "Values": {
+    "LocalAzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+
+    /* The pipeline will populate the Azure Deployment Configuration with these values. */
+    /* Adjust these values with keys from your Azure deployment */
+    "RedisCacheName": "xxx-graphquery-dev-redis",
+    "RedisCacheKey": "yourkey=",
+    "RedisConnectionString": "xxx-graphquery-dev-redis.redis.cache.windows.net:6380,password=yourkey,ssl=True,abortConnect=False",
+
+    /* You may want to hide the Swagger documents in production... See https://github.com/Azure/azure-functions-openapi-extension/blob/main/docs/openapi.md */
+    "OpenApi__HideSwaggerUI": "false",
+    "OpenApi__HideDocument": "false",
+    "OpenApi__DocTitle": "Azure Functions Redis Query Demo APIs",
+    "OpenApi__DocDescription": "This repo is an example of how to use Redis Queries inside of an Azure Function"
+  }
+}

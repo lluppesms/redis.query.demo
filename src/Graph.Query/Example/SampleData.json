@@ -1,0 +1,130 @@
+{
+	"corporate": [
+		{
+			"corporateid": 2805242,
+			"name": "CustomerViewofCustomer",
+			"sites": [
+				{
+					"id": 2807441,
+					"name": "Site 1",
+					"accounts": [
+						{
+							"id": 979784,
+							"name": "Account 1",
+							"accounts": [
+								{
+									"id": 1071348,
+									"name": "Account ab",
+									"groups": [
+										{
+											"id": 7000,
+											"name": "Group 1",
+											"systems": [
+												{
+													"id": 8000,
+													"name": "System 1",
+													"assets": [
+														{
+															"id": 9000,
+															"name": "Asset 1",
+															"ports": [
+																{
+																	"id": 11000,
+																	"name": "Port 1"
+																}
+															]
+														}
+													]
+												}
+											]
+										},
+										{
+											"id": 7000,
+											"name": "Group 2",
+											"systems": [
+												{
+													"id": 8000,
+													"name": "System 1",
+													"assets": [
+														{
+															"id": 9000,
+															"name": "Asset 1",
+															"ports": [
+																{
+																	"id": 11000,
+																	"name": "Port 1"
+																}
+															]
+														}
+													]
+												}
+											]
+										}
+
+									]
+								},
+								{
+									"id": 1071348,
+									"name": "Account ab2",
+									"groups": [
+										{
+											"id": 7000,
+											"name": "Group X",
+											"systems": [
+												{
+													"id": 8000,
+													"name": "System X",
+													"assets": [
+														{
+															"id": 9000,
+															"name": "Asset 1",
+															"ports": [
+																{
+																	"id": 11000,
+																	"name": "Port 1"
+																}
+															]
+														}
+													]
+												}
+											]
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				{
+					"id": 24221,
+					"name": "Account 2",
+					"groups": [
+						{
+							"id": 7001,
+							"name": "Group Y",
+							"systems": [
+								{
+									"id": 8001,
+									"name": "System Y",
+									"assets": [
+										{
+											"id": 9001,
+											"name": "Asset 2",
+											"ports": [
+												{
+													"id": 11001,
+													"name": "Port 2"
+												}
+											]
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	]
+}
+

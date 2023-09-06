@@ -1,0 +1,40 @@
+# ------------------------------------------------------------------------------------------------------------------------
+# Pipeline Template to build and deploy Application Only
+# ------------------------------------------------------------------------------------------------------------------------
+parameters:
+- name: environments
+  type: object
+  default: ['DEV']
+- name: variableGroupName
+  default: 'myVariableGroupName'
+- name: runDevSecOpsScan
+  default: 'true'
+- name: runPsRuleScan
+  default: 'true'
+
+# ----------------------------------------------------------------------------------------------------
+stages:
+- stage: BuildApplication
+  displayName: Build Application
+  jobs:
+  - ${{ if or(eq(lower(parameters.runDevSecOpsScan), 'true'), eq(lower(parameters.runPsRuleScan), 'true')) }}:
+    - template: templates/scan-code-template.yml
+      parameters:
+        environmentName: 'DEV'
+        runDevSecOpsScan: ${{ parameters.runDevSecOpsScan }}
+        runPsRuleScan: ${{ parameters.runPsRuleScan }}
+
+  - template: templates/build-function-template.yml
+    parameters:
+      variableGroupName: ${{ parameters.variableGroupName }}
+      environmentName: 'DEV'
+
+# ----------------------------------------------------------------------------------------------------
+- ${{ each environmentName in parameters.environments }} :
+  - stage: DeployApp${{ environmentName }}
+    displayName: Deploy ${{ environmentName }} Application
+    jobs:
+    - template: templates/deploy-function-template.yml
+      parameters:
+        variableGroupName: ${{ parameters.variableGroupName }}
+        environmentName: ${{ environmentName }}

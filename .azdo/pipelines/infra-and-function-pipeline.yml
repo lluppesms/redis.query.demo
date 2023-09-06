@@ -1,0 +1,48 @@
+# ------------------------------------------------------------------------------------------------------------------------
+# Pipeline to build and deploy Azure Resources and Application
+# ----------------------------------------------------------------------------------------------------
+# Note: This pipeline needs a variable group "GraphQuery"
+#  See ../Docs/Create-Variable-Group.md for details
+# ------------------------------------------------------------------------------------------------------------------------
+name: $(date:yyyy).$(date:MM).$(date:dd)$(rev:.r)
+pool:
+  vmImage: ubuntu-latest
+variables:
+  - group: GraphQuery
+
+# ------------------------------------------------------------------------------------------------------------------------
+trigger:
+  # since this repo has both AzDO and GHA pipelines, nothing is run automatically...
+  - none
+  # batch: true
+  # branches:
+  #   include:
+  #     - main
+  #   exclude:
+  #     - '**/*.md'
+  # paths:
+  #   include:
+  #     - 'src/Graph.Query/*'
+
+# ----------------------------------------------------------------------------------------------------
+parameters:
+  - name: runDevSecOpsScan
+    displayName: Run MS DevSecOps Scan
+    type: boolean
+    default: false
+  - name: runPsRuleScan
+    displayName: Run PSRule Bicep Scan
+    type: boolean
+    default: false
+
+# ----------------------------------------------------------------------------------------------------
+# This approach to optionally deploy QA works but it's not DRY
+# ----------------------------------------------------------------------------------------------------
+stages:
+# - ${{ if eq(lower(parameters.deployQA), 'false') }}:
+  - template: pipes/infra-and-function-pipe.yml
+    parameters:
+      variableGroupName: 'GraphQuery'
+      environments: ['DEV'] # [ 'DEV', 'QA']
+      runDevSecOpsScan: ${{ parameters.runDevSecOpsScan }}
+      runPsRuleScan: ${{ parameters.runPsRuleScan }}

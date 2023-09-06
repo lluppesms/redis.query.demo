@@ -1,0 +1,52 @@
+# ------------------------------------------------------------------------------------------------------------------------
+# Pipeline Template to build and deploy Azure Resources and Application
+# ------------------------------------------------------------------------------------------------------------------------
+parameters:
+- name: environments
+  type: object
+  default: ['DEV']
+- name: variableGroupName
+  default: 'myVariableGroupName'
+- name: runDevSecOpsScan
+  default: 'true'
+- name: runPsRuleScan
+  default: 'true'
+
+# ----------------------------------------------------------------------------------------------------
+stages:
+- stage: BuildApplication
+  displayName: Build Application
+  jobs:
+  - ${{ if or(eq(lower(parameters.runDevSecOpsScan), 'true'), eq(lower(parameters.runPsRuleScan), 'true')) }}:
+    - template: templates/scan-code-template.yml
+      parameters:
+        environmentName: 'DEV'
+        runDevSecOpsScan: ${{ parameters.runDevSecOpsScan }}
+        runPsRuleScan: ${{ parameters.runPsRuleScan }}
+
+  - template: templates/build-function-template.yml
+    parameters:
+      variableGroupName: ${{ parameters.variableGroupName }}
+      environmentName: 'DEV'
+
+# ----------------------------------------------------------------------------------------------------
+- ${{ each environmentName in parameters.environments }} :
+  - stage: CreateInfrastructure${{ environmentName }}
+    displayName: ${{ environmentName }} Infrastructure
+    dependsOn: BuildApplication
+    condition: succeeded('BuildApplication')
+    jobs:
+    - template: templates/create-infra-template.yml
+      parameters:
+        variableGroupName: ${{ parameters.variableGroupName }}
+        environmentName: ${{ environmentName }}
+
+  - stage: Deploy${{ environmentName }}App
+    displayName: Deploy ${{ environmentName }} App
+    dependsOn: CreateInfrastructure${{ environmentName }}
+    condition: succeeded('CreateInfrastructure${{ environmentName }}')
+    jobs:
+    - template: templates/deploy-function-template.yml
+      parameters:
+        variableGroupName: ${{ parameters.variableGroupName }}
+        environmentName: ${{ environmentName }}
