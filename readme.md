@@ -2,11 +2,11 @@
 
 [![Open in vscode.dev](https://img.shields.io/badge/Open%20in-vscode.dev-blue)][1]
 
-[1]: https://vscode.dev/github/lluppesms/graph.query.demo/
+[1]: https://vscode.dev/github/lluppesms/redis.query.demo/
 
 ![azd Compatible](./Docs/images/AZD_Compatible.png)
 
-[![deploy.infra.and.function](https://github.com/lluppesms/graph.query.demo/actions/workflows/deploy-infra-function.yml/badge.svg)](https://github.com/lluppesms/graph.query.demo/actions/workflows/deploy-infra-function.yml)
+[![deploy.infra.and.function](https://github.com/lluppesms/redis.query.demo/actions/workflows/deploy-infra-function.yml/badge.svg)](https://github.com/lluppesms/redis.query.demo/actions/workflows/deploy-infra-function.yml)
 
 ---
 
